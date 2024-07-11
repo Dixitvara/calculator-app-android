@@ -11,7 +11,7 @@ import com.google.android.material.button.MaterialButton;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextView smallDisplay, bigDisplay;
-    StringBuilder builder;
+    String bigNumber, smallNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +20,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         smallDisplay = findViewById(R.id.smallDisplay);
         bigDisplay = findViewById(R.id.bigDisplay);
-        builder = new StringBuilder();
-        bigDisplay.setText("0");
+
+        bigNumber = "";
+        smallNumber = "";
+
         // operation Button
         assignId(R.id.allClear);
         assignId(R.id.clear);
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    void assignId(int id) {
+    private void assignId(int id) {
         MaterialButton btn = findViewById(id);
         btn.setOnClickListener(this);
     }
@@ -58,46 +60,80 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MaterialButton btn = (MaterialButton) v;
         String btnText = btn.getText().toString();
 
-        if (btnText.equals("AC")) {
-            clearAll();
-            return;
+        switch (btnText) {
+            case "AC":
+                clearAll();
+                return;
+            case "Del":
+                delete();
+                return;
+            case "+":
+            case "/":
+            case "%":
+            case "*":
+            case "-":
+                chooseOperation(btnText);
+                return;
+            case "=":
+                compute();
+                return;
+            case "+/-":
+                negativePositive();
+                return;
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+            case "8":
+            case "9":
+            case "0":
+            case ".":
+                appendNumber(btnText);
         }
-        if (btnText.equals("C")) {
-            clear();
-            return;
-        }
-
-        // append text to display
-        appendText(v);
     }
 
-    // function that append text to display
-    void appendText(View v) {
-        MaterialButton btn = (MaterialButton) v;
-        String btnText = btn.getText().toString();
+    private void negativePositive() {
 
-        builder.append(btnText);
-        bigDisplay.setText(builder);
     }
 
-    // method that clear the whole display
-    void clearAll() {
-        builder.delete(0, builder.length());
-        bigDisplay.setText("0");
-    }
-
-    // method that delete a character
-    void clear() {
-        try {
-            if (builder.length() != 0) {
-                builder.deleteCharAt(builder.length() - 1);
-                bigDisplay.setText(builder);
-            }
-            if (builder.length() <= 0) {
-                bigDisplay.setText("0");
-            }
-        } catch (StringIndexOutOfBoundsException e) {
-            System.out.println(e);
+    private void appendNumber(String number) {
+        if (number.equals(".") && !bigNumber.contains(".")) {
+            bigNumber = bigNumber + number;
+            updateDisplay();
         }
+        if (!number.equals(".") && !bigNumber.contains(".")) {
+            bigNumber = bigNumber + number;
+            updateDisplay();
+        }
+        if (!number.equals(".") && bigNumber.contains(".")){
+            bigNumber = bigNumber + number;
+            updateDisplay();
+        }
+    }
+
+    private void chooseOperation(String operation) {
+
+    }
+
+    private void compute() {
+
+    }
+
+    private void updateDisplay() {
+        bigDisplay.setText(bigNumber);
+        smallDisplay.setText(smallNumber);
+    }
+
+    private void clearAll() {
+        smallNumber = "";
+        bigNumber = "";
+        updateDisplay();
+    }
+
+    private void delete() {
+//        bigNumber.charAt(bigNumber.length());
     }
 }
