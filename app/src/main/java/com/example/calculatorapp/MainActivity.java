@@ -114,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             bigNumber = "-" + bigNumber;
             updateDisplay();
-        } catch (StringIndexOutOfBoundsException ignored) {}
+        } catch (StringIndexOutOfBoundsException ignored) {
+        }
     }
 
     private void appendNumber(String number) {
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void chooseOperation(String operation) {
-        if(smallNumber.isEmpty() && bigNumber.isEmpty()) return;
+        if (smallNumber.isEmpty() && bigNumber.isEmpty()) return;
         if (!smallNumber.isEmpty() && bigDisplay.getText().toString().isEmpty()) {
             smallNumber = smallNumber.substring(0, smallNumber.length() - 1) + operation;
             updateDisplay();
@@ -146,9 +147,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void compute() {
-        if (bigDisplay.getText().toString().isEmpty()) {
+        if (bigDisplay.getText().toString().isEmpty() && smallDisplay.getText().toString().isEmpty()) {
             return;
         }
+        if (bigDisplay.getText().toString().isEmpty()) return;
+        if (smallDisplay.getText().toString().isEmpty() && !bigDisplay.getText().toString().isEmpty())
+            return;
         String operator = smallNumber.substring(smallNumber.length() - 1);
         smallNumber = smallNumber.substring(0, smallNumber.length() - 1);
         double computation;
