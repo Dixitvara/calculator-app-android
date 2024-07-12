@@ -1,6 +1,10 @@
 package com.example.calculatorapp;
 
+import static java.lang.Double.parseDouble;
+
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,11 +16,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     TextView smallDisplay, bigDisplay;
     String bigNumber, smallNumber;
+    Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         smallDisplay = findViewById(R.id.smallDisplay);
         bigDisplay = findViewById(R.id.bigDisplay);
@@ -57,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        vibrator.vibrate(25);
         MaterialButton btn = (MaterialButton) v;
         String btnText = btn.getText().toString();
 
@@ -68,9 +76,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 delete();
                 return;
             case "+":
+            case "÷":
             case "/":
             case "%":
-            case "*":
+            case "×":
             case "-":
                 chooseOperation(btnText);
                 return;
@@ -96,30 +105,78 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void negativePositive() {
-
+        try {
+            if (bigNumber.isEmpty()) return;
+            if (bigNumber.charAt(0) == '-') {
+                bigNumber = bigNumber.substring(1);
+                updateDisplay();
+                return;
+            }
+            bigNumber = "-" + bigNumber;
+            updateDisplay();
+        } catch (StringIndexOutOfBoundsException ignored) {}
     }
 
     private void appendNumber(String number) {
         if (number.equals(".") && !bigNumber.contains(".")) {
             bigNumber = bigNumber + number;
-            updateDisplay();
         }
         if (!number.equals(".") && !bigNumber.contains(".")) {
             bigNumber = bigNumber + number;
-            updateDisplay();
         }
-        if (!number.equals(".") && bigNumber.contains(".")){
+        if (!number.equals(".") && bigNumber.contains(".")) {
             bigNumber = bigNumber + number;
-            updateDisplay();
         }
+        updateDisplay();
     }
 
     private void chooseOperation(String operation) {
-
+        if(smallNumber.isEmpty() && bigNumber.isEmpty()) return;
+        if (!smallNumber.isEmpty() && bigDisplay.getText().toString().isEmpty()) {
+            smallNumber = smallNumber.substring(0, smallNumber.length() - 1) + operation;
+            updateDisplay();
+            return;
+        }
+        if (!smallNumber.isEmpty()) {
+            compute();
+        }
+        smallNumber = bigDisplay.getText().toString() + operation;
+        bigNumber = "";
+        updateDisplay();
     }
 
     private void compute() {
+        if (bigDisplay.getText().toString().isEmpty()) {
+            return;
+        }
+        String operator = smallNumber.substring(smallNumber.length() - 1);
+        smallNumber = smallNumber.substring(0, smallNumber.length() - 1);
+        double computation;
+        double previousNumber = parseDouble(smallNumber);
+        double currentNumber = parseDouble(bigNumber);
 
+        switch (operator) {
+            case "+":
+                computation = previousNumber + currentNumber;
+                break;
+            case "-":
+                computation = previousNumber - currentNumber;
+                break;
+            case "×":
+                computation = previousNumber * currentNumber;
+                break;
+            case "÷":
+                computation = previousNumber / currentNumber;
+                break;
+            case "%":
+                computation = previousNumber % currentNumber;
+                break;
+            default:
+                return;
+        }
+        bigNumber = String.valueOf(computation);
+        smallNumber = "";
+        updateDisplay();
     }
 
     private void updateDisplay() {
@@ -130,10 +187,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void clearAll() {
         smallNumber = "";
         bigNumber = "";
+        vibrator.vibrate(100);
         updateDisplay();
     }
 
     private void delete() {
-//        bigNumber.charAt(bigNumber.length());
+        try {
+            if (bigDisplay.getText().toString().isEmpty()) {
+                bigNumber = smallNumber.substring(0, smallNumber.length() - 1);
+                smallNumber = "";
+                updateDisplay();
+                return;
+            }
+            bigNumber = bigNumber.substring(0, bigNumber.length() - 1);
+            updateDisplay();
+        } catch (StringIndexOutOfBoundsException ignored) {
+        }
     }
 }

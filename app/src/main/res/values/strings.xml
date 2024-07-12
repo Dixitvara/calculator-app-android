@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Calculator App</string>
+    <string name="app_name">iCalculator</string>
     <string name="_0">0</string>
     <string name="ac">AC</string>
     <string name="divide">÷</string>
